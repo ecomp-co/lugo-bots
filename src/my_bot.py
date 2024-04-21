@@ -1,8 +1,9 @@
 import traceback
 from abc import ABC
 from typing import List
-
+import traceback
 import lugo4py
+from lugo4py import Point
 from settings import get_my_expected_position
 
 
@@ -71,7 +72,8 @@ class MyBot(lugo4py.Bot, ABC):
             else:
                 # Supondo que inspector.get_my_team().players retorna uma lista de objetos de jogador
                 my_goal = inspector.get_my_team().players
-
+                move_dest = get_my_expected_position(inspector, self.mapper, self.number)
+                move_order = inspector.make_order_move_max_speed(move_dest)
                 # Iterando sobre a lista de jogadores
                 for jogador in my_goal:
                     # Acessando informações sobre cada jogador
@@ -79,9 +81,6 @@ class MyBot(lugo4py.Bot, ABC):
                     print("Posição (x, y):", jogador.position.x, jogador.position.y)
                     print("Velocidade (direção):", jogador.velocity.direction)
                     # Imprima outras informações que você deseja acessar sobre o jogador
-
-
-                # move_order = self.move_towards_goal(bot_position, my_goal)
                 return [move_order]
         except Exception as e:
             print(f'did not play this turn due to exception {e}')
@@ -93,6 +92,9 @@ class MyBot(lugo4py.Bot, ABC):
             print("GOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOl",opponent_goal_point)  # Corrigido para get_center()
             goal_region = self.mapper.get_region_from_point(opponent_goal_point)
             my_region = self.mapper.get_region_from_point(inspector.get_me().position)
+
+            # specific_target_point = Point(12500, 8500) 
+            # print("CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAASSSSSSSSSSSSSSSSSSSIIIIIIIIIIIIIIIIIIOOOOOOOOOOOOO",specific_target_point.get_center()) # Substitua x_coordinate e y_coordinate pelos valores desejados
 
             my_move = inspector.make_order_move_max_speed(opponent_goal_point)
 
