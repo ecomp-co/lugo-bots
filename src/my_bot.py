@@ -14,7 +14,10 @@ class MyBot(lugo4py.Bot, ABC):
             ball_position = inspector.get_ball().position
 
             # try the auto complete for reader.make_order_... there are other options
-            move_order = inspector.make_order_move_max_speed(ball_position)
+
+            if self.should_i_help(get_my_expected_position(inspector, self.mapper, self.number), inspector.get_my_team_players(), ball_position, 2):
+                move_order = inspector.make_order_move_max_speed(ball_position)
+            # move_order = inspector.make_order_move_max_speed(ball_position)
 
             # Try other methods to create Move Orders:
             # move_order = reader.make_order_move_by_direction(lugo4py.DIRECTION_FORWARD)
@@ -32,56 +35,17 @@ class MyBot(lugo4py.Bot, ABC):
     def on_defending(self, inspector: lugo4py.GameSnapshotInspector) -> List[lugo4py.Order]:
         try:
             ball_position = inspector.get_ball().position
-            bot_position = inspector.get_me().position
-            my_region = self.mapper.get_region_from_point(inspector.get_ball().position)
-            my_region2 = self.mapper.get_region_from_point(inspector.get_me().position)
-            bots_moving_to_ball = 0
+            ball_region = self.mapper.get_region_from_point(inspector.get_ball().position)
+            my_region = self.mapper.get_region_from_point(inspector.get_me().position)
             my_goal = inspector.get_my_team().players
 
+            if self.should_i_help(inspector.get_me().position, inspector.get_my_team_players(), ball_position, 2):
+                move_order = inspector.make_order_move_max_speed(ball_position)
 
-            # for player in my_goal:
-            #     if self.is_near_ball(my_region, my_region2, 2):
-            #         bots_moving_to_ball += 1
-                    
-
-            # for bot in inspector.get_teammates():
-            #     if bots_moving_to_ball < 2:
-            #         # Se houver menos de 2 bots indo para a bola, o bot atual pode ir
-            #         if self.is_near_ball(my_region, my_region2, 10):
-            #             catch_order = inspector.make_order_catch()
-            #             target_position = ball_position
-            #             move_order = inspector.make_order_move_max_speed(target_position)
-            #             bots_moving_to_ball += 1
-            #             return [catch_order,move_order]
-            #         else:
-            #             # Caso contrário, permanece na defesa
-            #             move_order = inspector.make_order_move_max_speed(bot.position)
-            #             return [move_order]
-            #     else:
-            #         # Se já houver 2 bots indo para a bola, os outros permanecem na defesa
-            #             move_order = inspector.make_order_move_max_speed(bot.position)
-            #             return [move_order]
-            #     print("AQUIUAUUQUIQUUAIIQUQUQUUQUIQUQUUQUWSUQUUQSUQSUQUUSUIQUQSUUUQSUQUUQUSQUSUQUQSUUSUQSUQUSUQSUSQU",bots_moving_to_ball)
-
-            if self.is_near_ball(my_region, my_region2, 1):
-                # Se estiver perto da bola, tenta capturá-la
-                target_position = ball_position
-                move_order = inspector.make_order_move_max_speed(target_position)
-                catch_order = inspector.make_order_catch()
-                return [catch_order,move_order]
-            else:
-                # Supondo que inspector.get_my_team().players retorna uma lista de objetos de jogador
-                my_goal = inspector.get_my_team().players
-                move_dest = get_my_expected_position(inspector, self.mapper, self.number)
-                move_order = inspector.make_order_move_max_speed(move_dest)
-                # Iterando sobre a lista de jogadores
-                for jogador in my_goal:
-                    # Acessando informações sobre cada jogador
-                    print("Número:", jogador.number)
-                    print("Posição (x, y):", jogador.position.x, jogador.position.y)
-                    print("Velocidade (direção):", jogador.velocity.direction)
-                    # Imprima outras informações que você deseja acessar sobre o jogador
-                return [move_order]
+            # move_order = inspector.make_order_move_max_speed(move_dest)
+            catch_order = inspector.make_order_catch()
+            return [catch_order, move_order]
+            
         except Exception as e:
             print(f'did not play this turn due to exception {e}')
             traceback.print_exc()
@@ -89,19 +53,17 @@ class MyBot(lugo4py.Bot, ABC):
     def on_holding(self, inspector: lugo4py.GameSnapshotInspector) -> List[lugo4py.Order]:
         try:
             opponent_goal_point = self.mapper.get_attack_goal().get_center()
-            print("GOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOl",opponent_goal_point)  # Corrigido para get_center()
-            goal_region = self.mapper.get_region_from_point(opponent_goal_point)
+            opponent_goal_region = self.mapper.get_region_from_point(opponent_goal_point)
+            my_goal_point = self.mapper.get_defense_goal().get_center()
+            my_goal_region = self.mapper.get_region_from_point(my_goal_point)
             my_region = self.mapper.get_region_from_point(inspector.get_me().position)
-
-            # specific_target_point = Point(12500, 8500) 
-            # print("CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAASSSSSSSSSSSSSSSSSSSIIIIIIIIIIIIIIIIIIOOOOOOOOOOOOO",specific_target_point.get_center()) # Substitua x_coordinate e y_coordinate pelos valores desejados
 
             my_move = inspector.make_order_move_max_speed(opponent_goal_point)
 
-            if self.is_near(my_region, goal_region):
-                my_order = inspector.make_order_kick_max_speed(opponent_goal_point)  # Corrigido para opponent_goal_point
+            if self.is_near(my_region, opponent_goal_region, 1):
+                my_order = inspector.make_order_kick_max_speed(Point(20000,3600))
             else:
-                my_order = inspector.make_order_move_max_speed(opponent_goal_point)  # Corrigido para opponent_goal_point
+                my_order = inspector.make_order_move_max_speed(opponent_goal_point)
 
             return [my_order, my_move]
 
@@ -132,12 +94,19 @@ class MyBot(lugo4py.Bot, ABC):
 
     def as_goalkeeper(self, inspector: lugo4py.GameSnapshotInspector, state: lugo4py.PLAYER_STATE) -> List[lugo4py.Order]:
         try:
+            my_team = inspector.get_my_team_players()
             position = inspector.get_ball().position
+            alliedNumber4 = inspector.get_player(inspector.get_my_team_side(), 4); 
+
 
             if state != lugo4py.PLAYER_STATE.DISPUTING_THE_BALL:
                 position = self.mapper.get_attack_goal().get_center()
 
             my_order = inspector.make_order_move_max_speed(position)
+
+            # Try to kick to a player when the ball is on goalkeepers hold
+            if state == lugo4py.PLAYER_STATE.HOLDING_THE_BALL:
+                my_order = inspector.make_order_kick_max_speed(alliedNumber4.position)
 
             return [my_order, inspector.make_order_catch()]
 
@@ -148,18 +117,30 @@ class MyBot(lugo4py.Bot, ABC):
     def getting_ready(self, snapshot: lugo4py.GameSnapshot):
         print('getting ready')
 
-    def is_near(self, region_origin: lugo4py.mapper.Region, dest_origin: lugo4py.mapper.Region) -> bool:
-        max_distance = 1
+    def is_near(self, region_origin: lugo4py.mapper.Region, dest_origin: lugo4py.mapper.Region, max_distance: int) -> bool:
         return abs(region_origin.get_row() - dest_origin.get_row()) <= max_distance and abs(
             region_origin.get_col() - dest_origin.get_col()) <= max_distance
     
-    def is_near_ball(self, region_origin: lugo4py.mapper.Region, dest_origin: lugo4py.mapper.Region, max_distance: int) -> bool:
-        return abs(region_origin.get_row() - dest_origin.get_row()) <= max_distance and abs(
-            region_origin.get_col() - dest_origin.get_col()) <= max_distance
-    
-    def move_towards_goal(self, position: lugo4py.Point, goal_position: lugo4py.Point) -> lugo4py.Order:
-    # Move em direção ao nosso gol
-        direction_to_goal = lugo4py.Point(goal_position.x - position.x, goal_position.y - position.y)
-        target_position = lugo4py.Point(position.x + direction_to_goal.x, position.y + direction_to_goal.y)
-        return inspector.make_order_move_max_speed(target_position)
+    ########################
+    ### Custom functions ###
+    ########################
 
+    def should_i_help(self, my_position: Point, my_team, target_position: Point, max_helpers: int):
+        nearest_players = 0
+        my_distance = lugo4py.geo.distance_between_points(my_position, target_position)
+
+        for teamMate in my_team:
+            if teamMate.number != self.number:
+                distance = lugo4py.geo.distance_between_points(teamMate.position, target_position)
+                if distance < my_distance:
+                    nearest_players += 1
+                    if nearest_players >= max_helpers:
+                        return False
+        return True
+    
+    def opponent_is_near(self, opponent_team, region_origin: lugo4py.mapper.Region, max_distance) -> bool:
+        for player in opponent_team:
+            dest_origin = self.mapper.get_region_from_point(player.position)
+            if region_origin.get_row() - dest_origin.get_row() <= max_distance and region_origin.get_col() - dest_origin.get_col() <= max_distance:
+                return True
+        return False
