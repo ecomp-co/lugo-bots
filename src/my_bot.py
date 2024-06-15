@@ -61,7 +61,7 @@ class MyBot(lugo4py.Bot, ABC):
             my_move = inspector.make_order_move_max_speed(opponent_goal_point)
 
             if self.is_near(my_region, opponent_goal_region, 1):
-                my_order = inspector.make_order_kick_max_speed(Point(20000,3600))
+                my_order = inspector.make_order_kick_max_speed(Point(opponent_goal_point.x,(opponent_goal_point.y - 1350)))
             else:
                 my_order = inspector.make_order_move_max_speed(opponent_goal_point)
 
