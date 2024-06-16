@@ -38,9 +38,19 @@ class MyBot(lugo4py.Bot, ABC):
             ball_region = self.mapper.get_region_from_point(inspector.get_ball().position)
             my_region = self.mapper.get_region_from_point(inspector.get_me().position)
             my_goal = inspector.get_my_team().players
+            
+            # Nosso time
+            my_players = inspector.get_my_team_players()
+            me = inspector.get_me()
+
+            # Time adversário
+            opponent_players = inspector.get_opponent_players()
 
             if self.should_i_help(inspector.get_me().position, inspector.get_my_team_players(), ball_position, 2):
                 move_order = inspector.make_order_move_max_speed(ball_position)
+            
+            if (self.is_defender(me)):
+                self.mark_player(inspector, me, opponent_players) 
 
             # move_order = inspector.make_order_move_max_speed(move_dest)
             catch_order = inspector.make_order_catch()
@@ -59,6 +69,7 @@ class MyBot(lugo4py.Bot, ABC):
             my_region = self.mapper.get_region_from_point(inspector.get_me().position)
 
             my_move = inspector.make_order_move_max_speed(opponent_goal_point)
+            
 
             if self.is_near(my_region, opponent_goal_region, 1):
                 my_order = inspector.make_order_kick_max_speed(Point(opponent_goal_point.x,(opponent_goal_point.y - 1350)))
@@ -125,6 +136,23 @@ class MyBot(lugo4py.Bot, ABC):
     ### Custom functions ###
     ########################
 
+    # Retorna se algum jogador é ZAGUEIRO ou não
+    def is_defender(self, player: lugo4py.Player) -> bool:
+        # Constante que define o maior número da camisa dos defensores
+        DEFENDER_GREATEST_NUMBER = 5
+
+        return player.number <= DEFENDER_GREATEST_NUMBER
+
+    # Obtém o oponente mais próximo dentro de um raio indicado pelo parâmetro nearest_distance
+    def get_nearest_opponent(self, my_position: Point, 
+                             opponent_players: List[lugo4py.Player], 
+                             nearest_distance: int)-> lugo4py.Player:        
+        for opponent in opponent_players:
+            distance = lugo4py.geo.distance_between_points(my_position, opponent.position)
+            if (distance <= nearest_distance):
+                return opponent
+
+    # Por favor documentar o que isso faz :)
     def should_i_help(self, my_position: Point, my_team, target_position: Point, max_helpers: int):
         nearest_players = 0
         my_distance = lugo4py.geo.distance_between_points(my_position, target_position)
@@ -144,3 +172,12 @@ class MyBot(lugo4py.Bot, ABC):
             if region_origin.get_row() - dest_origin.get_row() <= max_distance and region_origin.get_col() - dest_origin.get_col() <= max_distance:
                 return True
         return False
+    
+    # Marca os atacantes adversários que estão sem a bola e próximos do gol
+    def mark_player(self, inspector, me, opponent_players):
+        # Vê qual jogador adversário está mais perto e fica atrás dele
+        nearest_opponent = self.get_nearest_opponent(me.position, opponent_players, 10)
+        if (nearest_opponent):
+            inspector.make_order_move_max_speed(nearest_opponent.position)
+
+        print('MARKING ATTACKER')
