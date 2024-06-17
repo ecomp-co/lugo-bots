@@ -11,7 +11,7 @@ from settings import get_my_expected_position
 from custom.actions import mark_player
 
 # Modificadores
-from custom.accessors_mutators import is_defender, get_nearest_opponent
+from custom.getters_setters import is_defender, get_nearest_opponent
 
 
 class MyBot(lugo4py.Bot, ABC):
