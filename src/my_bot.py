@@ -10,7 +10,7 @@ from settings import get_my_expected_position
 # Ações
 from custom.actions import mark_player
 
-# Modificadores
+# Getters e setters
 from custom.getters_setters import is_defender, get_nearest_opponent
 
 
