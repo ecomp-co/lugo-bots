@@ -199,10 +199,6 @@ class MyBot(lugo4py.Bot, ABC):
                 return True
         return False
 
-    # Protótipo da função mark_player
-    def mark_player(self, inspector, me, opponent_players):
-        pass
-
 
 #######################################################
 # Define funções customs que estão em outros arquivos #
