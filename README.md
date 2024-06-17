@@ -30,18 +30,32 @@ pip install -r requirements.txt
 ### On Linux or Mac
 ```shell
 cd /path/to/your/project
-sudo apt install python3.9-venv
+sudo apt install python3.9-venv # não precisa se já tiver o venv instalado 
+                                # (pra saber da pra testar o comando 
+                                # python3.9 -m venv --help)
 python3.9 -m venv venv
 . venv/bin/activate
-pip install -r requirements.txt
+pip install -r requirements.txt 
 ```
+
+Um possível erro que pode ocorrer nesse pip install é 
+"the ssl module in Python is not available."
+E outros milhares de erros por faltar bibliotecas no seu pc
+Para resolver isso faça: 
+
+```shell
+sudo apt install libssl-dev
+sudo apt install build-essential zlib1g-dev libncurses5-dev libgdbm-dev libnss3-dev libssl-dev libreadline-dev libffi-dev curl libbz2-dev
+```
+
+Depois desinstale o python3.9 e instale novamente para compilá-lo com
+suporte às bibliotecas
 
 ### Configure VS Code
 
-1. `ctrl + p`
-2. "Python: Create Environment"
-3. Venv
-4. Select Python3.9 
+1. Vá para algum arquivo python
+2. No canto inferior direito, clique no botão "Select Python Interpreter"
+3. Selecione o python3.9 do venv desse projeto
 
 #### Configure IntellyJ IDE family (PyCharm, Idea, and others)
 
@@ -69,7 +83,7 @@ You may use the [SetupEnvPy](https://hub.docker.com/r/lugobots/setup-env-py) Doc
    docker pull python:3.9-slim-buster
    ```
 2. Run the builder service that will install the depencencies you need (**wait for the service to finish**):
-   ```sell 
+   ```shell 
    docker compose up builder
    ```
 3. **Test it out**: Before any change, make the Dummies Py play to ensure you are not working on a broken code.
