@@ -11,9 +11,10 @@ from settings import get_my_expected_position
 from custom.actions import *
 
 # Getters e setters
-from custom.getters_setters import is_defender, get_nearest_opponent
+from custom.getters_setters import *
 
 DEFENSE_COL = 2
+MIDFIELD_COL = 4
 
 
 class MyBot(lugo4py.Bot, ABC):
@@ -77,12 +78,20 @@ class MyBot(lugo4py.Bot, ABC):
                 move_order = inspector.make_order_move_max_speed(ball_position)
 
             print('DEFENDING')
+            # Checa se é zagueiro
             if (self.is_defender(me)):
                 print('IS A DEFENDER')
                 print('MRKING')
                 move_dest = self.mark_player(inspector, me, my_players,
                                              opponent_players, 1000,
-                                             DEFENSE_COL)
+                                             range(0, DEFENSE_COL + 1))
+
+            # Checa se é meio-campista
+            elif (self.is_midfielder(me)):
+                print('IS A MIDFIELDER')
+                move_dest = self.mark_player(
+                    inspector, me, my_players, opponent_players, 1000,
+                    range(DEFENSE_COL, MIDFIELD_COL + 1))
 
             # Se move_dest não tiver sido definido, então não retorna nenhuma ordem para
             # evitar erros no turno
@@ -235,6 +244,8 @@ MyBot.stop_marking = stop_marking
 ############### Modifiers ##############
 # Adiciona a função is_defender ao MyBot
 MyBot.is_defender = is_defender
+# Adiciona a função is_midfielder ao MyBot
+MyBot.is_midfielder = is_midfielder
 
 # Adiciona a função get_nearest_opponent ao MyBot
 MyBot.get_nearest_opponent = get_nearest_opponent
