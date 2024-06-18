@@ -67,6 +67,7 @@ class MyBot(lugo4py.Bot, ABC):
                 inspector.get_me().position)
             my_goal = inspector.get_my_team().players
             move_dest = None
+            move_order = None
 
             # Time adversário
             opponent_players = inspector.get_opponent_players()
@@ -90,16 +91,20 @@ class MyBot(lugo4py.Bot, ABC):
                                   inspector.get_my_team_players(),
                                   ball_position, 2):
                 print('HELPING')
-                move_order = inspector.make_order_move_max_speed(ball_position)
+                move_dest = ball_position
 
             # Se move_dest não tiver sido definido, então não retorna nenhuma ordem para
             # evitar erros no turno
-            if (not move_dest):
-                return
+            #if (not move_dest and not move_order):
+            #    return
 
             move_order = inspector.make_order_move_max_speed(move_dest)
-            catch_order = inspector.make_order_catch()
-            return [catch_order, move_order]
+            if (lugo4py.geo.distance_between_points(me.position, ball_position)
+                    < 500):
+                catch_order = inspector.make_order_catch()
+                return [catch_order, move_order]
+
+            return [move_order]
 
         except Exception as e:
             print(f'did not play this turn due to exception {e}')
@@ -238,7 +243,7 @@ class MyBot(lugo4py.Bot, ABC):
 ############### Actions ################
 # Adiciona a função mark_player ao MyBot
 MyBot.mark_player = mark_player
-MyBot.stop_marking = stop_marking
+# MyBot.stop_marking = stop_marking
 
 ############### Modifiers ##############
 # Adiciona a função is_defender ao MyBot
