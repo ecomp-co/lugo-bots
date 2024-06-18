@@ -32,6 +32,17 @@ def mark_player(self, inspector: lugo4py.GameSnapshotInspector,
     if (not nearest_opponent):
         return None
 
+    my_distance = lugo4py.geo.distance_between_points(
+        nearest_opponent.position, me.position)
+
+    # Se tiver um amigo muito próximo, não marca
+    for teammate in my_team_players:
+        teammate_distance = lugo4py.geo.distance_between_points(
+            nearest_opponent.position, teammate.position)
+
+        if (teammate_distance < my_distance):
+            return None
+
     opponent_region = self.mapper.get_region_from_point(
         nearest_opponent.position)
     # Checa se o adversário está na zona de defesa
