@@ -70,13 +70,6 @@ class MyBot(lugo4py.Bot, ABC):
 
             # Time adversário
             opponent_players = inspector.get_opponent_players()
-
-            if self.should_i_help(inspector.get_me().position,
-                                  inspector.get_my_team_players(),
-                                  ball_position, 2):
-                print('HELPING')
-                move_order = inspector.make_order_move_max_speed(ball_position)
-
             print('DEFENDING')
             # Checa se é zagueiro
             if (self.is_defender(me)):
@@ -92,6 +85,12 @@ class MyBot(lugo4py.Bot, ABC):
                 move_dest = self.mark_player(
                     inspector, me, my_players, opponent_players, 1000,
                     range(DEFENSE_COL, MIDFIELD_COL + 1))
+
+            if self.should_i_help(inspector.get_me().position,
+                                  inspector.get_my_team_players(),
+                                  ball_position, 2):
+                print('HELPING')
+                move_order = inspector.make_order_move_max_speed(ball_position)
 
             # Se move_dest não tiver sido definido, então não retorna nenhuma ordem para
             # evitar erros no turno
