@@ -13,13 +13,21 @@ import lugo4py
 from lugo4py import Point
 from settings import get_my_expected_position
 
+# Constante que define o maior número da camisa dos defensores
+DEFENDER_GREATEST_NUMBER = 5
+# Constante que define o maior número da camisa dos meio-campistas
+MIDFIELDER_GREATEST_NUMBER = 10
+
 
 # Retorna se algum jogador é ZAGUEIRO ou não
 def is_defender(self, player: lugo4py.Player) -> bool:
-    # Constante que define o maior número da camisa dos defensores
-    DEFENDER_GREATEST_NUMBER = 5
-
     return player.number <= DEFENDER_GREATEST_NUMBER
+
+
+# Retorna se algum jogador é MEIO-CAMPISTA ou não
+def is_midfielder(self, player: lugo4py.Player) -> bool:
+
+    return player.number > DEFENDER_GREATEST_NUMBER and player.number <= MIDFIELDER_GREATEST_NUMBER
 
 
 # Obtém o oponente mais próximo dentro de um raio indicado pelo parâmetro nearest_distance
