@@ -68,16 +68,16 @@ class MyBot(lugo4py.Bot, ABC):
             # Time adversário
             opponent_players = inspector.get_opponent_players()
 
-            # if self.should_i_help(inspector.get_me().position,
-            #                       inspector.get_my_team_players(),
-            #                       ball_position, 2):
-            #     move_order = inspector.make_order_move_max_speed(ball_position)
+            if self.should_i_help(inspector.get_me().position,
+                                  inspector.get_my_team_players(),
+                                  ball_position, 2):
+                move_order = inspector.make_order_move_max_speed(ball_position)
 
             print('DEFENDING')
             if (self.is_defender(me)):
                 print('IS A DEFENDER')
                 move_dest = self.mark_player(inspector, me, my_players,
-                                             opponent_players, 5000)
+                                             opponent_players, 1000)
 
             # Se move_dest não tiver sido definido, então não retorna nenhuma ordem para
             # evitar erros no turno

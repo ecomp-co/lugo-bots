@@ -27,36 +27,11 @@ def mark_player(self, inspector: lugo4py.GameSnapshotInspector,
     nearest_opponent = self.get_nearest_opponent(me.position, opponent_players,
                                                  distance)
 
-    # Checa se achou algum jogador adversário
-    if (nearest_opponent != None):
-        print('TRYING TO MARK ', nearest_opponent.number)
-        print('FOUND OPPONENT')
-        # Vê se outro jogador já está marcando o mesmo jogador
-        for player in my_team_players:
-            if (player.number == me.number):
-                continue
+    # Checa se não achou algum jogador adversário
+    if (not nearest_opponent):
+        return None
 
-            for opponent in marked_players:
-                if (opponent.number == nearest_opponent.number):
-                    print('ALREADY MARKED')
-                    return me.position
-
-            # if (self.is_marking):
-            #     if (player.markng_opponent.number == nearest_opponent.number):
-            #         print('BBBBBBBBB')
-            #         # Se já estiver marcando, não faz nada
-            #         # TODO: futuramente, fazer algo pra ele não ficar parado
-            #         return me.position
-
-        # Indica qual oponente está sendo marcado
-        marked_players.append(nearest_opponent)
-        self.markng_opponent = nearest_opponent
-        self.is_marking = True
-
-        print('MARKING ATTACKER')
-
-        # Se o oponente estiver sem marcação, vai em direção a ele
-        return nearest_opponent.position
+    return nearest_opponent.position
 
 
 # Atualiza para NONE o estado de marcação

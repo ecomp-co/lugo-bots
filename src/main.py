@@ -1,5 +1,6 @@
 from my_bot import MyBot
 from lugo4py import NewDefaultStarter
+from lugo4py.src import lugo
 
 if __name__ == "__main__":
     #################################################################################
@@ -8,7 +9,7 @@ if __name__ == "__main__":
     #                       Work on my_bot.py file                                  #
     #################################################################################
     #################################################################################
-    
+
     starter = NewDefaultStarter()
 
     # The default mapper uses a 10x6 map
@@ -24,12 +25,11 @@ if __name__ == "__main__":
     # starter.set_initial_position(position)
     # starter.set_mapper(mapper)
 
+
     def on_join():
         print("I may run it when the bot is connected to the server")
 
-    starter.run(MyBot(
-        starter.get_config().get_bot_team_side(),
-        starter.get_config().get_bot_number(),
-        starter.get_initial_position(),
-        starter.get_mapper()
-    ), on_join)
+    starter.run(
+        MyBot(starter.get_config().get_bot_team_side(),
+              starter.get_config().get_bot_number(),
+              starter.get_initial_position(), starter.get_mapper()), on_join)
