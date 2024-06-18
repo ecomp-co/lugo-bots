@@ -13,6 +13,8 @@ from custom.actions import *
 # Getters e setters
 from custom.getters_setters import is_defender, get_nearest_opponent
 
+DEFENSE_COL = 2
+
 
 class MyBot(lugo4py.Bot, ABC):
 
@@ -71,13 +73,16 @@ class MyBot(lugo4py.Bot, ABC):
             if self.should_i_help(inspector.get_me().position,
                                   inspector.get_my_team_players(),
                                   ball_position, 2):
+                print('HELPING')
                 move_order = inspector.make_order_move_max_speed(ball_position)
 
             print('DEFENDING')
             if (self.is_defender(me)):
                 print('IS A DEFENDER')
+                print('MRKING')
                 move_dest = self.mark_player(inspector, me, my_players,
-                                             opponent_players, 1000)
+                                             opponent_players, 1000,
+                                             DEFENSE_COL)
 
             # Se move_dest não tiver sido definido, então não retorna nenhuma ordem para
             # evitar erros no turno

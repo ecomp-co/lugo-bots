@@ -22,7 +22,8 @@ marked_players = []
 # distance -> distância que define se um jogador está próximo ou não
 def mark_player(self, inspector: lugo4py.GameSnapshotInspector,
                 me: lugo4py.Bot, my_team_players: List[lugo4py.Bot],
-                opponent_players: List[lugo4py.Bot], distance: float):
+                opponent_players: List[lugo4py.Bot], distance: float,
+                defense_col: int):
     # Vê qual jogador adversário está mais perto e vai em direção a ele
     nearest_opponent = self.get_nearest_opponent(me.position, opponent_players,
                                                  distance)
@@ -31,6 +32,16 @@ def mark_player(self, inspector: lugo4py.GameSnapshotInspector,
     if (not nearest_opponent):
         return None
 
+    opponent_region = self.mapper.get_region_from_point(
+        nearest_opponent.position)
+    # Checa se o adversário está na zona de defesa
+    print('OPPONENT REGION: ', opponent_region)
+
+    if (opponent_region.col > defense_col):
+        print('OPPONENT IS NOT IN DEFENSE REGION')
+        return None
+
+    print('OPPONENT IS IN DEFENSE REGION')
     return nearest_opponent.position
 
 
