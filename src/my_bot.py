@@ -8,13 +8,16 @@ from settings import get_my_expected_position
 
 # Importação de funções customizadas
 # Ações
-from custom.actions import mark_player
+from custom.actions import *
 
 # Getters e setters
 from custom.getters_setters import is_defender, get_nearest_opponent
 
 
 class MyBot(lugo4py.Bot, ABC):
+
+    is_marking = False
+    marking_player = None
 
     def on_disputing(
             self,
@@ -49,29 +52,39 @@ class MyBot(lugo4py.Bot, ABC):
             self,
             inspector: lugo4py.GameSnapshotInspector) -> List[lugo4py.Order]:
         try:
+            # Nosso time
+            my_players = inspector.get_my_team_players()
+            me = inspector.get_me()
+
+            # Posições
             ball_position = inspector.get_ball().position
             ball_region = self.mapper.get_region_from_point(
                 inspector.get_ball().position)
             my_region = self.mapper.get_region_from_point(
                 inspector.get_me().position)
             my_goal = inspector.get_my_team().players
-
-            # Nosso time
-            my_players = inspector.get_my_team_players()
-            me = inspector.get_me()
+            move_dest = None
 
             # Time adversário
             opponent_players = inspector.get_opponent_players()
 
-            if self.should_i_help(inspector.get_me().position,
-                                  inspector.get_my_team_players(),
-                                  ball_position, 2):
-                move_order = inspector.make_order_move_max_speed(ball_position)
+            # if self.should_i_help(inspector.get_me().position,
+            #                       inspector.get_my_team_players(),
+            #                       ball_position, 2):
+            #     move_order = inspector.make_order_move_max_speed(ball_position)
 
+            print('DEFENDING')
             if (self.is_defender(me)):
-                self.mark_player(inspector, me, opponent_players, 10)
+                print('IS A DEFENDER')
+                move_dest = self.mark_player(inspector, me, my_players,
+                                             opponent_players, 5000)
 
-            # move_order = inspector.make_order_move_max_speed(move_dest)
+            # Se move_dest não tiver sido definido, então não retorna nenhuma ordem para
+            # evitar erros no turno
+            if (not move_dest):
+                return
+
+            move_order = inspector.make_order_move_max_speed(move_dest)
             catch_order = inspector.make_order_catch()
             return [catch_order, move_order]
 
@@ -119,6 +132,9 @@ class MyBot(lugo4py.Bot, ABC):
                 ball_holder_position)
             my_region = self.mapper.get_region_from_point(
                 inspector.get_me().position)
+
+            # Stop marking
+            self.stop_marking(inspector.get_me())
 
             # if self.is_near(ball_holder_region, my_region):
             move_dest = get_my_expected_position(inspector, self.mapper,
@@ -209,6 +225,7 @@ class MyBot(lugo4py.Bot, ABC):
 ############### Actions ################
 # Adiciona a função mark_player ao MyBot
 MyBot.mark_player = mark_player
+MyBot.stop_marking = stop_marking
 
 ############### Modifiers ##############
 # Adiciona a função is_defender ao MyBot

@@ -25,9 +25,15 @@ def is_defender(self, player: lugo4py.Player) -> bool:
 # Obtém o oponente mais próximo dentro de um raio indicado pelo parâmetro nearest_distance
 def get_nearest_opponent(self, my_position: Point,
                          opponent_players: List[lugo4py.Player],
-                         nearest_distance: int) -> lugo4py.Player:
+                         nearest_distance: float) -> lugo4py.Player:
+    print('GETTING NEAREST OPPONENT')
     for opponent in opponent_players:
         distance = lugo4py.geo.distance_between_points(my_position,
                                                        opponent.position)
+
+        print('DISTANCE from opponent: ', distance, 'opp number: ',
+              opponent.number)
         if (distance <= nearest_distance):
+            print('NEAREST OPPONENT FOUND')
+            print('NEAREST OPPONENT: ', opponent.number)
             return opponent
