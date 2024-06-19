@@ -53,6 +53,10 @@ def mark_player(self, inspector: lugo4py.GameSnapshotInspector,
         print('OPPONENT IS NOT IN DEFENSE REGION')
         return None
 
+    # Se o adversário está com a bola, vai na direção da bola
+    if (nearest_opponent == inspector.get_ball_holder()):
+        return inspector.get_ball().position
+
     print('OPPONENT IS IN DEFENSE REGION')
     return nearest_opponent.position
 
