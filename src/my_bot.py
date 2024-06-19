@@ -30,7 +30,6 @@ class MyBot(lugo4py.Bot, ABC):
             ball_position = inspector.get_ball().position
 
             # try the auto complete for reader.make_order_... there are other options
-
             if self.should_i_help(
                     get_my_expected_position(inspector, self.mapper,
                                              self.number),
@@ -98,11 +97,16 @@ class MyBot(lugo4py.Bot, ABC):
             #if (not move_dest and not move_order):
             #    return
 
-            move_order = inspector.make_order_move_max_speed(move_dest)
+            if move_dest:
+                move_order = inspector.make_order_move_max_speed(move_dest)
+
             if (lugo4py.geo.distance_between_points(me.position, ball_position)
                     < 500):
                 catch_order = inspector.make_order_catch()
                 return [catch_order, move_order]
+
+            if (not move_order):
+                return
 
             return [move_order]
 
@@ -152,7 +156,7 @@ class MyBot(lugo4py.Bot, ABC):
                 inspector.get_me().position)
 
             # Stop marking
-            self.stop_marking(inspector.get_me())
+            # self.stop_marking(inspector.get_me())
 
             # if self.is_near(ball_holder_region, my_region):
             move_dest = get_my_expected_position(inspector, self.mapper,
