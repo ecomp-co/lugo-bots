@@ -36,6 +36,7 @@ def mark_player(self, inspector: lugo4py.GameSnapshotInspector,
         nearest_opponent.position, me.position)
 
     # Se tiver um amigo muito próximo, não marca
+    # BUG pode ser que eu esteja deixando de marcar alguém só por que tem um amigo próximo mas ele pode estar marcando outro oponente
     for teammate in my_team_players:
         teammate_distance = lugo4py.geo.distance_between_points(
             nearest_opponent.position, teammate.position)

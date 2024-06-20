@@ -30,6 +30,7 @@ class MyBot(lugo4py.Bot, ABC):
             ball_position = inspector.get_ball().position
 
             # try the auto complete for reader.make_order_... there are other options
+            # BUG isso depende da posição da bola, pq se ela tiver perto do nosso gol, nossos jogadores param de marcar e vão pra cima da bola, deixando varios adversários livres
             if self.should_i_help(
                     get_my_expected_position(inspector, self.mapper,
                                              self.number),
@@ -65,12 +66,14 @@ class MyBot(lugo4py.Bot, ABC):
             my_region = self.mapper.get_region_from_point(
                 inspector.get_me().position)
             my_goal = inspector.get_my_team().players
-            move_dest = None
-            move_order = None
 
             # Time adversário
             opponent_players = inspector.get_opponent_players()
             print('DEFENDING')
+
+            move_dest = None
+            move_order = None
+
             # Checa se é zagueiro
             if (self.is_defender(me)):
                 print('IS A DEFENDER')
@@ -79,6 +82,22 @@ class MyBot(lugo4py.Bot, ABC):
                                              opponent_players, 1000,
                                              range(0, DEFENSE_COL + 1))
 
+                # Checa se há algum adversário livre perto do gol caso não
+                # esteja marcando ninguém
+                # Selecionando somente zagueiros para não puxar um meio
+                # campista lá da frente para a linha de fundo
+                if (not move_dest):
+                    opponents_in_range = self.get_opponents_in_range(
+                        me.position, opponent_players,
+                        range(0, DEFENSE_COL + 1))
+                    if (opponents_in_range):
+                        if (
+                                not self.is_any_teammate_next_to_opponent(
+                                    me.position, my_players,
+                                    opponents_in_range[0])
+                        ):  # TODO ao invés de pegar só o de índice 0 tem que pegar o mais próximo de mim, e que ao mesmo tempo ta mais longe dos outros
+                            move_dest = opponents_in_range[0].position
+
             # Checa se é meio-campista
             elif (self.is_midfielder(me)):
                 print('IS A MIDFIELDER')
@@ -86,6 +105,7 @@ class MyBot(lugo4py.Bot, ABC):
                     inspector, me, my_players, opponent_players, 1000,
                     range(DEFENSE_COL, MIDFIELD_COL + 1))
 
+            # Pressiona jogador com a bola
             if self.should_i_help(inspector.get_me().position,
                                   inspector.get_my_team_players(),
                                   ball_position, 2):
@@ -249,7 +269,7 @@ class MyBot(lugo4py.Bot, ABC):
 MyBot.mark_player = mark_player
 # MyBot.stop_marking = stop_marking
 
-############### Modifiers ##############
+########## Getters e setters ###########
 # Adiciona a função is_defender ao MyBot
 MyBot.is_defender = is_defender
 # Adiciona a função is_midfielder ao MyBot
@@ -257,3 +277,7 @@ MyBot.is_midfielder = is_midfielder
 
 # Adiciona a função get_nearest_opponent ao MyBot
 MyBot.get_nearest_opponent = get_nearest_opponent
+# Adiciona a função get_opponents_in_range ao MyBot
+MyBot.get_opponents_in_range = get_opponents_in_range
+# Adiciona a função is_any_teammate_next_to_opponent ao MyBot
+MyBot.is_any_teammate_next_to_opponent = is_any_teammate_next_to_opponent
