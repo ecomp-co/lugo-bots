@@ -76,3 +76,21 @@ def is_any_teammate_next_to_opponent(self, my_position: Point,
 
         if (teammate_distance < my_distance):
             return False
+
+
+# Obtém melhor ponto do gol adversário para chutar a bola
+def get_point_to_kick(self, goalkeeper_position: Point, goal_position: Point,
+                      goalkeeper_width: int, goal_width: int) -> Point:
+    # Vê qual lado do gol o goleiro está mais próximo
+    # Goleiro está para baixo, então chuta no ponto mais alto do gol
+    if (goalkeeper_position.y <= goal_position.y):
+        return Point(goal_position.x, goal_position.y + goal_width / 2)
+
+    # Goleiro está para cima, então chuta no ponto mais baixo do gol
+    return Point(goal_position.x, goal_position.y - goal_width / 2)
+
+
+def is_near_point(self, point_1: Point, point_2: Point,
+                  max_distance: float) -> bool:
+    return lugo4py.geo.distance_between_points(point_1,
+                                               point_2) <= max_distance

@@ -138,9 +138,15 @@ class MyBot(lugo4py.Bot, ABC):
             self,
             inspector: lugo4py.GameSnapshotInspector) -> List[lugo4py.Order]:
         try:
+            print('HOLDING')
+            goal_width = 3000
+            goalkeeper_width = 920
+
             opponent_goal_point = self.mapper.get_attack_goal().get_center()
             opponent_goal_region = self.mapper.get_region_from_point(
                 opponent_goal_point)
+            opponent_goalkeeper = inspector.get_opponent_goalkeeper()
+
             my_goal_point = self.mapper.get_defense_goal().get_center()
             my_goal_region = self.mapper.get_region_from_point(my_goal_point)
             my_region = self.mapper.get_region_from_point(
@@ -148,11 +154,16 @@ class MyBot(lugo4py.Bot, ABC):
 
             my_move = inspector.make_order_move_max_speed(opponent_goal_point)
 
-            if self.is_near(my_region, opponent_goal_region, 1):
-                my_order = inspector.make_order_kick_max_speed(
-                    Point(opponent_goal_point.x,
-                          (opponent_goal_point.y - 1350)))
+            if self.is_near_point(opponent_goal_point,
+                                  inspector.get_me().position, 1000):
+                kick_point = get_point_to_kick(self,
+                                               opponent_goalkeeper.position,
+                                               opponent_goal_point,
+                                               goalkeeper_width, goal_width)
+                my_order = inspector.make_order_kick_max_speed(kick_point)
+
             else:
+                print("MOVING")
                 my_order = inspector.make_order_move_max_speed(
                     opponent_goal_point)
 
@@ -270,6 +281,8 @@ MyBot.mark_player = mark_player
 # MyBot.stop_marking = stop_marking
 
 ########## Getters e setters ###########
+MyBot.is_near_point = is_near_point
+
 # Adiciona a função is_defender ao MyBot
 MyBot.is_defender = is_defender
 # Adiciona a função is_midfielder ao MyBot
@@ -281,3 +294,5 @@ MyBot.get_nearest_opponent = get_nearest_opponent
 MyBot.get_opponents_in_range = get_opponents_in_range
 # Adiciona a função is_any_teammate_next_to_opponent ao MyBot
 MyBot.is_any_teammate_next_to_opponent = is_any_teammate_next_to_opponent
+
+MyBot.get_point_to_kick = get_point_to_kick
